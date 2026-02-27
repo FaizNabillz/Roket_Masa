@@ -2,14 +2,14 @@
 <html lang="ms">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Misi: Kod Rahsia Roket</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Poppins:wght@400;600&display=swap');
 
         body {
             margin: 0;
-            padding: 0;
+            padding: 10px;
             background: linear-gradient(135deg, #203a43 0%, #2c5364 100%);
             color: white;
             font-family: 'Poppins', sans-serif;
@@ -17,12 +17,14 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            overflow: hidden;
+            min-height: 100dvh;
+            overflow-x: hidden;
+            overflow-y: auto; /* Membenarkan scroll jika skrin sangat kecil */
+            box-sizing: border-box;
         }
 
-        /* Latar belakang bintang */
         .stars {
-            position: absolute;
+            position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
             background-image: 
                 radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 5px),
@@ -41,9 +43,9 @@
 
         #game-container {
             width: 100%;
-            max-width: 400px;
+            max-width: 420px;
             text-align: center;
-            padding: 20px;
+            padding: clamp(10px, 4vw, 25px);
             box-sizing: border-box;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
             border-radius: 15px;
@@ -52,7 +54,6 @@
             transition: transform 0.1s;
         }
 
-        /* Animasi Gegaran (Shake) apabila salah */
         @keyframes shake {
             0% { transform: translate(1px, 1px) rotate(0deg); }
             10% { transform: translate(-1px, -2px) rotate(-1deg); }
@@ -75,16 +76,17 @@
         h1 {
             font-family: 'Orbitron', sans-serif;
             color: #4db8ff;
-            font-size: 22px;
+            font-size: clamp(18px, 5vw, 22px);
             text-shadow: 0 0 10px rgba(77, 184, 255, 0.5);
-            margin-bottom: 15px;
+            margin: 0 0 10px 0;
         }
 
         .stats-bar {
             display: flex;
             justify-content: center;
-            gap: 15px;
-            margin-bottom: 20px;
+            gap: 10px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
         }
 
         .stat-box {
@@ -93,8 +95,9 @@
             padding: 5px 15px;
             border-radius: 20px;
             font-weight: 600;
-            font-size: 14px;
+            font-size: clamp(12px, 3vw, 14px);
             box-shadow: 0 0 10px rgba(255, 193, 7, 0.4);
+            white-space: nowrap;
         }
 
         .stat-box.cubaan {
@@ -104,10 +107,14 @@
         }
 
         #instruction {
-            font-size: 14px;
-            margin-bottom: 20px;
+            font-size: clamp(12px, 3.5vw, 14px);
+            margin-bottom: 10px;
             color: #e0e0e0;
-            height: 40px;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
         }
 
         #tahap-indicator {
@@ -118,7 +125,7 @@
         .clock-container {
             display: flex;
             justify-content: center;
-            margin-bottom: 30px;
+            margin-bottom: clamp(10px, 2vh, 20px);
             position: relative;
         }
 
@@ -126,21 +133,25 @@
             background-color: white;
             border-radius: 50%;
             box-shadow: 0 0 30px rgba(0, 210, 255, 0.6), inset 0 0 10px rgba(0,0,0,0.1);
-            border: 4px solid #4db8ff;
+            border: clamp(2px, 1vw, 4px) solid #4db8ff;
+            width: 100%;
+            max-width: 180px; /* Saiz max dikurangkan agar muat skrin telefon */
+            height: auto;
+            aspect-ratio: 1 / 1;
         }
 
         .input-area {
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 20px;
+            gap: clamp(5px, 2vw, 10px);
+            margin-bottom: clamp(5px, 2vh, 15px);
         }
 
         input {
-            width: 80px;
-            padding: 10px;
-            font-size: 20px;
+            width: clamp(60px, 15vw, 80px);
+            padding: clamp(6px, 1.5vh, 10px);
+            font-size: clamp(18px, 5vw, 22px);
             font-family: 'Orbitron', sans-serif;
             text-align: center;
             border: 2px solid #4db8ff;
@@ -148,81 +159,129 @@
             background: rgba(255, 255, 255, 0.9);
             outline: none;
             color: #000;
+            cursor: pointer;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        input.aktif {
+            border: 3px solid #ffc107;
+            box-shadow: 0 0 15px rgba(255, 193, 7, 0.6);
         }
 
         #input-area-tahap3 input {
-            width: 60px;
+            width: clamp(50px, 12vw, 65px);
         }
 
         .colon {
-            font-size: 30px;
+            font-size: clamp(20px, 6vw, 26px);
             font-weight: bold;
             color: #4db8ff;
             font-family: 'Orbitron', sans-serif;
-            margin: 0 5px;
+            margin: 0 2px;
         }
 
         #unit-label {
-            font-size: 18px;
+            font-size: clamp(14px, 4vw, 16px);
             font-weight: bold;
             color: #4db8ff;
         }
 
-        button {
-            background: linear-gradient(to right, #00d2ff, #3a7bd5);
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            font-size: 16px;
+        #feedback {
             font-weight: bold;
-            font-family: 'Poppins', sans-serif;
-            border-radius: 25px;
+            font-size: clamp(13px, 3.5vw, 15px);
+            min-height: 24px;
+            margin-bottom: 5px;
+        }
+
+        /* --- REKAAN PAPAN KEKUNCI (Grid Diperbetulkan) --- */
+        .keypad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: clamp(6px, 1.5vw, 10px);
+            margin-top: 5px; 
+            width: 100%;
+        }
+
+        .key {
+            background: rgba(255, 255, 255, 0.15);
+            border: 2px solid #4db8ff;
+            color: white;
+            font-size: clamp(16px, 4vw, 20px);
+            font-family: 'Orbitron', sans-serif;
+            padding: clamp(6px, 1.5vh, 10px) 0;
+            border-radius: 10px;
             cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0, 210, 255, 0.4);
-            transition: transform 0.1s, box-shadow 0.1s;
+            transition: all 0.1s;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            margin: 0 auto;
-            width: 80%;
+            user-select: none;
+            touch-action: manipulation; 
         }
 
-        button:active {
+        .key:active {
             transform: scale(0.95);
+            background: rgba(77, 184, 255, 0.5);
         }
 
-        #feedback {
-            margin-top: 20px;
+        .key-action {
+            background: rgba(255, 71, 87, 0.2);
+            border-color: #ff4757;
+        }
+        
+        .key-action:active {
+            background: rgba(255, 71, 87, 0.5);
+        }
+
+        /* Butang hantar memenuhi ketiga-tiga ruang kolum di bawah */
+        .key-enter {
+            background: rgba(46, 204, 113, 0.2);
+            border-color: #2ecc71;
+            grid-column: span 3; 
+            font-family: 'Poppins', sans-serif;
             font-weight: bold;
-            font-size: 15px;
-            min-height: 24px;
+            font-size: clamp(14px, 4vw, 16px);
+            padding: clamp(10px, 2.5vh, 15px) 0;
+            margin-top: 5px;
+        }
+
+        .key-enter:active {
+            background: rgba(46, 204, 113, 0.5);
+        }
+
+        /* Ruang Kosong dalam Grid supaya nombor 0 berada di tengah */
+        .empty-space {
+            visibility: hidden;
         }
 
         .rocket {
-            font-size: 50px;
-            margin-top: 20px;
+            font-size: clamp(30px, 8vw, 40px);
+            position: fixed; /* Fixed supaya tidak ganggu susunan */
+            bottom: 20px;
+            right: 20px;
             transition: transform 1.5s cubic-bezier(0.25, 1, 0.5, 1);
-            display: inline-block;
+            z-index: 5;
         }
 
         .rocket-fly {
-            transform: translateY(-400px) scale(0.5);
+            transform: translateY(-800px) scale(0.5);
             opacity: 0;
         }
         
         #win-modal {
             display: none;
-            position: absolute;
+            position: fixed; /* Fixed untuk sentiasa di tengah skrin */
             top: 50%; left: 50%;
             transform: translate(-50%, -50%);
             background: rgba(11, 16, 33, 0.95);
             border: 2px solid #4db8ff;
-            padding: 30px;
+            padding: clamp(20px, 5vw, 30px);
             border-radius: 20px;
             z-index: 10;
             text-align: center;
             box-shadow: 0 0 50px rgba(0, 210, 255, 0.5);
+            width: 80%;
+            max-width: 350px;
         }
     </style>
 </head>
@@ -230,8 +289,10 @@
 
     <div class="stars"></div>
 
+    <div class="rocket" id="rocket-icon">🚀</div>
+
     <div id="game-container">
-        <h1>MISI: KOD RAHSIA ROKET</h1>
+        <h1>KOD RAHSIA ROKET</h1>
         
         <div class="stats-bar">
             <div class="stat-box">Skor: <span id="skor">0</span></div>
@@ -239,39 +300,55 @@
         </div>
 
         <div id="instruction">
-            <span id="tahap-indicator">TAHAP 1:</span> <span id="arahan-teks">Lihat jarum MERAH (Minit). Berapa minit itu?</span>
+            <div id="tahap-indicator">TAHAP 1:</div>
+            <div id="arahan-teks">Lihat jarum MERAH (Minit). Berapa minit itu?</div>
         </div>
 
         <div class="clock-container">
-            <canvas id="clockCanvas" width="240" height="240"></canvas>
+            <canvas id="clockCanvas" width="300" height="300"></canvas>
         </div>
 
         <div class="input-area" id="input-area-biasa">
-            <input type="number" id="jawapan" placeholder="???" autocomplete="off">
+            <input type="text" id="jawapan" placeholder="??" readonly onclick="setAktifInput('jawapan')">
             <span id="unit-label">Minit</span>
         </div>
 
         <div class="input-area" id="input-area-tahap3" style="display: none;">
-            <input type="number" id="jawapan-jam" placeholder="Jam" min="1" max="12" autocomplete="off">
+            <input type="text" id="jawapan-jam" placeholder="Jam" readonly onclick="setAktifInput('jawapan-jam')">
             <span class="colon">:</span>
-            <input type="number" id="jawapan-minit" placeholder="Minit" min="0" max="59" autocomplete="off">
+            <input type="text" id="jawapan-minit" placeholder="Minit" readonly onclick="setAktifInput('jawapan-minit')">
         </div>
 
-        <button onclick="semakJawapan()">🚀 HANTAR KOD!</button>
-
         <div id="feedback"></div>
+
+        <div class="keypad">
+            <div class="key" onclick="tekanNombor('1')">1</div>
+            <div class="key" onclick="tekanNombor('2')">2</div>
+            <div class="key" onclick="tekanNombor('3')">3</div>
+            <div class="key" onclick="tekanNombor('4')">4</div>
+            <div class="key" onclick="tekanNombor('5')">5</div>
+            <div class="key" onclick="tekanNombor('6')">6</div>
+            <div class="key" onclick="tekanNombor('7')">7</div>
+            <div class="key" onclick="tekanNombor('8')">8</div>
+            <div class="key" onclick="tekanNombor('9')">9</div>
+            
+            <div class="empty-space"></div>
+            <div class="key" onclick="tekanNombor('0')">0</div>
+            <div class="key key-action" onclick="padamNombor()">⌫</div>
+            
+            <div class="key key-enter" onclick="semakJawapan()">HANTAR KOD! ✓</div>
+        </div>
         
-        <div class="rocket" id="rocket-icon">🚀</div>
     </div>
 
     <div id="win-modal">
-        <h2 style="color: #4db8ff;">MISI BERJAYA! 🌌</h2>
-        <p>Anda telah menguasai kemahiran membaca jam dan menyelamatkan roket!</p>
-        <button onclick="restartGame()" style="margin-top: 20px;">Main Semula</button>
+        <h2 style="color: #4db8ff; font-size: clamp(18px, 5vw, 24px);">MISI BERJAYA! 🌌</h2>
+        <p style="font-size: clamp(14px, 4vw, 16px);">Anda telah menguasai kemahiran membaca jam dan menyelamatkan roket!</p>
+        <button onclick="restartGame()" style="margin-top: 15px; background: #4db8ff; color: #fff; border: none; padding: 10px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px;">Main Semula</button>
     </div>
 
     <script>
-        // --- SISTEM AUDIO MENGGUNAKAN WEB AUDIO API (Tanpa Fail Luar) ---
+        // --- SISTEM AUDIO ---
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         let audioCtx;
 
@@ -280,50 +357,36 @@
             if (audioCtx.state === 'suspended') audioCtx.resume();
         }
 
-        // Bunyi Bintang (Jawapan Betul)
         function playSoundBintang() {
             initAudio();
             const now = audioCtx.currentTime;
-            // Frekuensi not muzik untuk bunyi 'ting ting ting' (magikal)
-            const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
-            
+            const notes = [523.25, 659.25, 783.99, 1046.50]; 
             notes.forEach((freq, index) => {
                 const osc = audioCtx.createOscillator();
                 const gainNode = audioCtx.createGain();
-                
                 osc.type = 'sine';
                 osc.frequency.value = freq;
-                
                 osc.connect(gainNode);
                 gainNode.connect(audioCtx.destination);
-                
-                // Animasi kekuatan bunyi (Fade in & Fade out cepat)
                 gainNode.gain.setValueAtTime(0, now + index * 0.1);
                 gainNode.gain.linearRampToValueAtTime(0.2, now + index * 0.1 + 0.05);
                 gainNode.gain.exponentialRampToValueAtTime(0.01, now + index * 0.1 + 0.3);
-                
                 osc.start(now + index * 0.1);
                 osc.stop(now + index * 0.1 + 0.3);
             });
         }
 
-        // Bunyi Tettt (Jawapan Salah)
         function playSoundTettt() {
             initAudio();
             const now = audioCtx.currentTime;
             const osc = audioCtx.createOscillator();
             const gainNode = audioCtx.createGain();
-            
-            // Bunyi kasar seperti buzzer
             osc.type = 'sawtooth';
             osc.frequency.value = 150; 
-            
             osc.connect(gainNode);
             gainNode.connect(audioCtx.destination);
-            
             gainNode.gain.setValueAtTime(0.2, now);
             gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
-            
             osc.start(now);
             osc.stop(now + 0.5);
         }
@@ -335,6 +398,7 @@
         let cubaan = 0;
         let jamSasaran = 0;
         let minitSasaran = 0;
+        let inputSemasa = null; 
 
         const canvas = document.getElementById('clockCanvas');
         const ctx = canvas.getContext('2d');
@@ -342,6 +406,44 @@
         ctx.translate(radius, radius);
         const clockRadius = radius * 0.85;
 
+        // --- FUNGSI PAPAN KEKUNCI ---
+        function setAktifInput(id) {
+            initAudio(); 
+            document.getElementById('jawapan').classList.remove('aktif');
+            document.getElementById('jawapan-jam').classList.remove('aktif');
+            document.getElementById('jawapan-minit').classList.remove('aktif');
+            
+            inputSemasa = document.getElementById(id);
+            inputSemasa.classList.add('aktif');
+        }
+
+        function tekanNombor(num) {
+            initAudio();
+            if (!inputSemasa) return;
+
+            if (inputSemasa.value.length < 2) {
+                inputSemasa.value += num;
+            }
+
+            if (tahap === 3 && inputSemasa.id === 'jawapan-jam') {
+                if (inputSemasa.value.length === 2 || parseInt(inputSemasa.value) > 9) {
+                    setAktifInput('jawapan-minit');
+                }
+            }
+        }
+
+        function padamNombor() {
+            initAudio();
+            if (!inputSemasa) return;
+            
+            if (inputSemasa.value.length > 0) {
+                inputSemasa.value = inputSemasa.value.slice(0, -1);
+            } else if (tahap === 3 && inputSemasa.id === 'jawapan-minit') {
+                setAktifInput('jawapan-jam');
+            }
+        }
+
+        // --- LOGIK PERMAINAN ---
         function mulakanPusingan() {
             document.getElementById('jawapan').value = "";
             document.getElementById('jawapan-jam').value = "";
@@ -351,28 +453,28 @@
             if (tahap === 1) {
                 minitSasaran = Math.floor(Math.random() * 60);
                 jamSasaran = Math.floor(Math.random() * 12) + 1;
-                document.getElementById('arahan-teks').innerHTML = "Lihat jarum <span style='color:#ff4757; font-weight:bold;'>MERAH</span> (Minit). Berapa minit itu?";
+                document.getElementById('arahan-teks').innerHTML = "Lihat jarum <span style='color:#ff4757; font-weight:bold;'>MERAH</span>. Berapa minit itu?";
                 document.getElementById('input-area-biasa').style.display = "flex";
                 document.getElementById('input-area-tahap3').style.display = "none";
-                document.getElementById('jawapan').focus();
+                setAktifInput('jawapan');
             } 
             else if (tahap === 2) {
                 minitSasaran = Math.floor(Math.random() * 12) * 5;
                 jamSasaran = Math.floor(Math.random() * 12) + 1;
                 document.getElementById('tahap-indicator').innerHTML = "TAHAP 2:";
-                document.getElementById('arahan-teks').innerHTML = "Lihat KEDUA-DUA jarum. Berapakah <b>minit</b> yang ditunjukkan? (Gandaan 5)";
+                document.getElementById('arahan-teks').innerHTML = "Berapakah <b>minit</b>? (Gandaan 5)";
                 document.getElementById('input-area-biasa').style.display = "flex";
                 document.getElementById('input-area-tahap3').style.display = "none";
-                document.getElementById('jawapan').focus();
+                setAktifInput('jawapan');
             } 
             else if (tahap === 3) {
                 minitSasaran = Math.floor(Math.random() * 60);
                 jamSasaran = Math.floor(Math.random() * 12) + 1;
                 document.getElementById('tahap-indicator').innerHTML = "TAHAP 3:";
-                document.getElementById('arahan-teks').innerHTML = "Tulis <b>WAKTU LENGKAP</b> berdasarkan kedua-dua jarum.";
+                document.getElementById('arahan-teks').innerHTML = "Tulis <b>WAKTU LENGKAP</b>.";
                 document.getElementById('input-area-biasa').style.display = "none";
                 document.getElementById('input-area-tahap3').style.display = "flex";
-                document.getElementById('jawapan-jam').focus();
+                setAktifInput('jawapan-jam');
             }
 
             lukisJam();
@@ -393,7 +495,7 @@
             ctx.fillStyle = 'white';
             ctx.fill();
             ctx.strokeStyle = '#2c3e50';
-            ctx.lineWidth = 6;
+            ctx.lineWidth = 8;
             ctx.stroke();
             ctx.beginPath();
             ctx.arc(0, 0, radius * 0.05, 0, 2 * Math.PI);
@@ -426,7 +528,7 @@
                 ctx.rotate(ang);
                 ctx.moveTo(0, -radius * 0.95);
                 ctx.lineTo(0, i % 5 === 0 ? -radius * 0.85 : -radius * 0.92);
-                ctx.lineWidth = i % 5 === 0 ? 3 : 1;
+                ctx.lineWidth = i % 5 === 0 ? 4 : 1.5;
                 ctx.strokeStyle = '#555';
                 ctx.stroke();
                 ctx.rotate(-ang);
@@ -446,7 +548,7 @@
             lukisJarum(ctx, minuteAngle, radius * 0.8, radius * 0.04, "#ff4757");
             
             ctx.beginPath();
-            ctx.arc(0, 0, radius * 0.03, 0, 2 * Math.PI);
+            ctx.arc(0, 0, radius * 0.04, 0, 2 * Math.PI);
             ctx.fillStyle = '#ff4757';
             ctx.fill();
         }
@@ -463,9 +565,8 @@
             ctx.rotate(-pos);
         }
 
-        // --- SEMAKAN JAWAPAN & LOGIK PERMAINAN ---
+        // --- SEMAKAN JAWAPAN ---
         function semakJawapan() {
-            // Aktifkan audio context jika ia digantung (browser security policy)
             initAudio(); 
 
             let maklumbalasElemen = document.getElementById('feedback');
@@ -475,54 +576,46 @@
             let minitDiformat = minitSasaran.toString().padStart(2, '0');
 
             if (tahap === 1 || tahap === 2) {
-                let inputElemen = document.getElementById('jawapan');
-                let jawapanPengguna = inputElemen.value.trim();
-                if (jawapanPengguna === "") return;
+                let inputVal = document.getElementById('jawapan').value;
+                if (inputVal === "") return;
                 
-                let nilaiMinit = parseInt(jawapanPengguna);
+                let nilaiMinit = parseInt(inputVal);
                 if (nilaiMinit === minitSasaran || (minitSasaran === 0 && nilaiMinit === 60)) {
                     betul = true;
                 }
                 jawapanSebenarStr = minitSasaran + " minit";
-                inputElemen.disabled = true;
 
             } else if (tahap === 3) {
-                let inputJam = document.getElementById('jawapan-jam');
-                let inputMinit = document.getElementById('jawapan-minit');
-                if (inputJam.value.trim() === "" || inputMinit.value.trim() === "") return;
+                let inputJam = document.getElementById('jawapan-jam').value;
+                let inputMinit = document.getElementById('jawapan-minit').value;
+                if (inputJam === "" || inputMinit === "") return;
 
-                let nilaiJam = parseInt(inputJam.value.trim());
-                let nilaiMinit = parseInt(inputMinit.value.trim());
+                let nilaiJam = parseInt(inputJam);
+                let nilaiMinit = parseInt(inputMinit);
 
                 jawapanSebenarStr = `${jamSasaran}:${minitDiformat}`;
 
                 if (nilaiJam === jamSasaran && (nilaiMinit === minitSasaran || (minitSasaran === 0 && nilaiMinit === 60))) {
                     betul = true;
                 }
-                
-                inputJam.disabled = true;
-                inputMinit.disabled = true;
             }
 
             cubaan++;
             document.getElementById('cubaan').innerText = cubaan;
 
             if (betul) {
-                playSoundBintang(); // Bunyi ting-ting-ting (magikal/bintang)
+                playSoundBintang(); 
                 skor++;
                 skorTahap++;
                 document.getElementById('skor').innerText = skor;
                 maklumbalasElemen.innerHTML = "✅ BETUL! Roket berlepas! 🚀🎉";
                 maklumbalasElemen.style.color = "#2ecc71";
                 
-                // Roket Terbang!
                 let roket = document.getElementById('rocket-icon');
                 roket.classList.add('rocket-fly');
 
                 setTimeout(() => {
                     roket.classList.remove('rocket-fly');
-                    enableInputs();
-                    
                     if (skorTahap >= 3) {
                         tahapSeterusnya();
                     } else {
@@ -531,26 +624,17 @@
                 }, 1500);
 
             } else {
-                playSoundTettt(); // Bunyi buzzer 'Tettt'
-                
-                // Tambah efek gegaran (shake) pada kotak permainan
+                playSoundTettt(); 
                 kotakPermainan.classList.add('shake-effect');
                 
                 maklumbalasElemen.innerHTML = `❌ Cuba lagi! Jawapan: ${jawapanSebenarStr}`;
                 maklumbalasElemen.style.color = "#ff4757";
                 
                 setTimeout(() => {
-                    kotakPermainan.classList.remove('shake-effect'); // Buang class supaya boleh digegar lagi nanti
-                    enableInputs();
+                    kotakPermainan.classList.remove('shake-effect'); 
                     mulakanPusingan(); 
                 }, 2000);
             }
-        }
-
-        function enableInputs() {
-            document.getElementById('jawapan').disabled = false;
-            document.getElementById('jawapan-jam').disabled = false;
-            document.getElementById('jawapan-minit').disabled = false;
         }
 
         function tahapSeterusnya() {
@@ -578,23 +662,13 @@
             mulakanPusingan();
         }
 
-        // Tekan Enter untuk hantar
-        function tambahEventEnter(id) {
-            document.getElementById(id).addEventListener("keypress", function(event) {
-                if (event.key === "Enter") {
-                    event.preventDefault();
-                    semakJawapan();
-                }
-            });
-        }
-        
-        tambahEventEnter("jawapan");
-        tambahEventEnter("jawapan-jam");
-        tambahEventEnter("jawapan-minit");
-
-        document.getElementById("jawapan-jam").addEventListener("input", function() {
-            if (this.value.length >= 2 || parseInt(this.value) > 9) {
-                document.getElementById("jawapan-minit").focus();
+        document.addEventListener("keydown", function(event) {
+            if (event.key >= '0' && event.key <= '9') {
+                tekanNombor(event.key);
+            } else if (event.key === 'Backspace') {
+                padamNombor();
+            } else if (event.key === 'Enter') {
+                semakJawapan();
             }
         });
 
